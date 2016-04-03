@@ -152,10 +152,13 @@ void Sudoku::solve(){
 	}
 	for(i=0;i<9;i++){
 		for(j=0;j<9;j++){
+			if((map1[i][j]!=0)||(map1[i][j]!=0)){
 				if((map1[i+1][j]==map1[i][j])||(map1[i][j+1]==map1[i][j])){
 					cout<<"0"<<endl;
 					exit(0);
 				}
+			}
+			else continue;
 		}
 	}
 	if(try_1st(map1,0,0)){
