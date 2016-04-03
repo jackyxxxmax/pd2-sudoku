@@ -1,1 +1,2 @@
-# pd2-sudoku
+compile:make
+execute:./Sudoku
