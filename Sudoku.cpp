@@ -150,6 +150,14 @@ void Sudoku::solve(){
 			map2[i][j]=map1[i][j];
 		}
 	}
+	for(i=0;i<9;i++){
+		for(j=0;j<9;j++){
+				if((map1[i+1][j]==map1[i][j])||(map1[i][j+1]==map1[i][j])){
+					cout<<"0"<<endl;
+					exit(0);
+				}
+		}
+	}
 	if(try_1st(map1,0,0)){
 		if(try_2nd(map2,0,0)){
 			for(i=0;i<=8;i++){
