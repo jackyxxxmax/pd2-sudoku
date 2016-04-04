@@ -3,14 +3,14 @@
 void Sudoku::giveQuestion(){
 	ifstream infile("test1.txt");
 
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
 			infile>>question[i][j];
 		}
 	}
 	infile.close();
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
 			cout<<question[i][j];
 			cout<<" ";
 		}
@@ -19,8 +19,8 @@ void Sudoku::giveQuestion(){
 }
 
 void Sudoku::outputAns(){
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
 			cout<<map1[i][j];
 			cout<<" ";
 		}
@@ -32,12 +32,12 @@ void Sudoku::outputAns(){
 int Sudoku::test(int sudoku[][9],int row,int col,int fig){
 	int i,j;
 	for(i=0;i<9;++i){
-		if((sudoku[row][i]==fig)||(sudoku[i][col]==fig)){ //checking in row and col
+		if((sudoku[row][i]==fig)||(sudoku[i][col]==fig)){ //檢查列和行
 			return 0;
 		}
 	}
 
-	int rowBegin=(row/3)*3; //checking in the grid
+	int rowBegin=(row/3)*3; //檢查cell
 	int colBegin=(col/3)*3;
 	for(i=rowBegin;i<(rowBegin+3);++i){
 		for(j=colBegin;j<(colBegin+3);++j){
@@ -52,7 +52,7 @@ int Sudoku::test(int sudoku[][9],int row,int col,int fig){
 int Sudoku::try_1st(int sudoku[][9],int row,int col){
 	int i;
 	if(row<9&&col<9){
-		if(sudoku[row][col]!=0){ //pre filled
+		if(sudoku[row][col]!=0){ //檢查已填入的
 			if((col+1)<9){
 				return try_1st(sudoku,row,col+1);
 			}
@@ -99,7 +99,7 @@ int Sudoku::try_1st(int sudoku[][9],int row,int col){
 int Sudoku::try_2nd(int sudoku[][9],int row,int col){
 	int i;
 	if(row<9&&col<9){
-		if(sudoku[row][col]!=0){ //pre filled
+		if(sudoku[row][col]!=0){ //檢查已填入的
 			if((col+1)<9){
 				return try_2nd(sudoku,row,col+1);
 			}
@@ -150,21 +150,36 @@ void Sudoku::solve(){
 			map2[i][j]=map1[i][j];
 		}
 	}
-	for(i=0;i<9;i++){
-		for(j=0;j<9;j++){
-			if((map1[i][j]!=0)||(map1[i][j]!=0)){
-				if((map1[i+1][j]==map1[i][j])||(map1[i][j+1]==map1[i][j])){
-					cout<<"0"<<endl;
-					exit(0);
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
+			if(map1[i][j]){
+				for(int m=0;m<9;m++){ //判斷同一行有無重複數字
+					if((map1[m][j]==map1[i][j])&&(i!=m)){
+						printf("0\n");
+						return;
+					}
+				}
+				for(int n=0;n<9;n++){ //判斷同一列有無重複數字
+					if((map1[i][n]==map1[i][j])&&(j!=n)){
+						printf("0\n");
+						return;
+					}
+				}
+				for(int m=0;m<3;m++){ //判斷同一小方格有無重複數字
+					for(int n=0;n<3;n++){
+						if(map1[i-(i%3)+m][j-(j%3)+n]==map1[i][j]&&i!=(i-(i%3)+m)&&j!=(j-(j%3)+n)){
+						printf("0\n");
+						return;
+						}
+					}
 				}
 			}
-			else continue;
 		}
 	}
 	if(try_1st(map1,0,0)){
 		if(try_2nd(map2,0,0)){
-			for(i=0;i<=8;i++){
-				for(j=0;j<=8;j++){
+			for(i=0;i<9;i++){
+				for(j=0;j<9;j++){
 					if(map1[i][j]!=map2[i][j]){ //相同代表唯一解
 						cout<<"2"<<endl;
 						exit(0);
@@ -172,8 +187,8 @@ void Sudoku::solve(){
 				}
 			}
 						cout<<"1"<<endl;
-			for(i=0;i<=8;i++){
-				for(j=0;j<=8;j++){
+			for(i=0;i<9;i++){
+				for(j=0;j<9;j++){
 					cout<<map1[i][j];
 					cout<<" ";
 				}
@@ -185,53 +200,45 @@ void Sudoku::solve(){
 }
 
 void Sudoku::readIn(){
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
 			cin>>map1[i][j];
 		}
 	}
 }
 
 void Sudoku::mapTobuffer(){ //將map寫入buffer
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
 			buffer[i][j]=map1[i][j];
 		}
 	}
 }
 
 void Sudoku::changeNum(int a,int b){
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
-			buffer[i][j]=map1[i][j];
-		}
-	}
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
+	mapTobuffer();
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
 			if(map1[i][j]==a){map1[i][j]=b;}
 			else if(map1[i][j]==b){map1[i][j]=a;}
 		}
 	}
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
-			buffer[i][j]=map1[i][j];
-		}
-	}
+	mapTobuffer();
 }
 
 void Sudoku::changeRow(int a,int b){
 	for(;;){
 		if(a==0){
 			int temp[9][9];
-			for(int i=0;i<=2;i++){
-				for(int j=0;j<=8;j++){
+			for(int i=0;i<3;i++){
+				for(int j=0;j<9;j++){
 					temp[i][j]=map1[i][j];
 				}
 			}
 			if(b==0){break;}
 			else if(b==1){
-				for(int i=0;i<=2;i++){
-					for(int j=0;j<=8;j++){
+				for(int i=0;i<3;i++){
+					for(int j=0;j<9;j++){
 						map1[i][j]=map1[i+3][j];
 						map1[i+3][j]=temp[i][j];
 					}
@@ -239,8 +246,8 @@ void Sudoku::changeRow(int a,int b){
 				break;
 			}
 			else if(b==2){
-				for(int i=0;i<=2;i++){
-					for(int j=0;j<=8;j++){
+				for(int i=0;i<3;i++){
+					for(int j=0;j<9;j++){
 						map1[i][j]=map1[i+6][j];
 						map1[i+6][j]=temp[i][j];
 					}
@@ -250,14 +257,14 @@ void Sudoku::changeRow(int a,int b){
 		}		
 		if(a==1){
 			int temp[9][9];
-			for(int i=0;i<=2;i++){
-				for(int j=0;j<=8;j++){
+			for(int i=0;i<3;i++){
+				for(int j=0;j<9;j++){
 					temp[i][j]=map1[i+3][j];
 				}
 			}
 			if(b==0){
-				for(int i=0;i<=2;i++){
-					for(int j=0;j<=8;j++){
+				for(int i=0;i<3;i++){
+					for(int j=0;j<9;j++){
 						map1[i+3][j]=map1[i][j];
 						map1[i][j]=temp[i][j];
 					}
@@ -266,8 +273,8 @@ void Sudoku::changeRow(int a,int b){
 			}
 			else if(b==1){break;}
 			else if(b==2){
-				for(int i=0;i<=2;i++){
-					for(int j=0;j<=8;j++){
+				for(int i=0;i<3;i++){
+					for(int j=0;j<9;j++){
 						map1[i+3][j]=map1[i+6][j];
 						map1[i+6][j]=temp[i][j];
 					}
@@ -277,14 +284,14 @@ void Sudoku::changeRow(int a,int b){
 		}
 		if(a==2){
 			int temp[9][9];
-			for(int i=0;i<=2;i++){
-				for(int j=0;j<=8;j++){
+			for(int i=0;i<3;i++){
+				for(int j=0;j<9;j++){
 					temp[i][j]=map1[i+6][j];
 				}
 			}
 			if(b==0){
-				for(int i=0;i<=2;i++){
-					for(int j=0;j<=8;j++){
+				for(int i=0;i<3;i++){
+					for(int j=0;j<9;j++){
 						map1[i+6][j]=map1[i][j];
 						map1[i][j]=temp[i][j];
 					}
@@ -292,8 +299,8 @@ void Sudoku::changeRow(int a,int b){
 				break;
 			}
 			else if(b==1){
-				for(int i=0;i<=2;i++){
-					for(int j=0;j<=8;j++){
+				for(int i=0;i<3;i++){
+					for(int j=0;j<9;j++){
 						map1[i+6][j]=map1[i+3][j];
 						map1[i+3][j]=temp[i][j];
 					}
@@ -303,26 +310,22 @@ void Sudoku::changeRow(int a,int b){
 			else if(b==2){break;}
 		}
 	}
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
-			buffer[i][j]=map1[i][j];
-		}
-	}
+	mapTobuffer();
 }
 
 void Sudoku::changeCol(int a,int b){
 	for(;;){
 		if(a==0){
 			int temp[9][9];
-			for(int i=0;i<=8;i++){
-				for(int j=0;j<=2;j++){
+			for(int i=0;i<9;i++){
+				for(int j=0;j<3;j++){
 					temp[i][j]=map1[i][j];
 				}
 			}
 			if(b==0){break;}
 			else if(b==1){
-				for(int i=0;i<=8;i++){
-					for(int j=0;j<=2;j++){
+				for(int i=0;i<9;i++){
+					for(int j=0;j<3;j++){
 						map1[i][j]=map1[i][j+3];
 						map1[i][j+3]=temp[i][j];
 					}
@@ -330,8 +333,8 @@ void Sudoku::changeCol(int a,int b){
 				break;
 			}
 			else if(b==2){
-				for(int i=0;i<=8;i++){
-					for(int j=0;j<=2;j++){
+				for(int i=0;i<9;i++){
+					for(int j=0;j<3;j++){
 						map1[i][j]=map1[i][j+6];
 						map1[i][j+6]=temp[i][j];
 					}
@@ -341,14 +344,14 @@ void Sudoku::changeCol(int a,int b){
 		}		
 		if(a==1){
 			int temp[9][9];
-			for(int i=0;i<=8;i++){
-				for(int j=0;j<=2;j++){
+			for(int i=0;i<9;i++){
+				for(int j=0;j<3;j++){
 					temp[i][j]=map1[i][j+3];
 				}
 			}
 			if(b==0){
-				for(int i=0;i<=8;i++){
-					for(int j=0;j<=2;j++){
+				for(int i=0;i<9;i++){
+					for(int j=0;j<3;j++){
 						map1[i][j+3]=map1[i][j];
 						map1[i][j]=temp[i][j];
 					}
@@ -357,8 +360,8 @@ void Sudoku::changeCol(int a,int b){
 			}
 			else if(b==1){break;}
 			else if(b==2){
-				for(int i=0;i<=8;i++){
-					for(int j=0;j<=2;j++){
+				for(int i=0;i<9;i++){
+					for(int j=0;j<3;j++){
 						map1[i][j+3]=map1[i][j+6];
 						map1[i][j+6]=temp[i][j];
 					}
@@ -368,14 +371,14 @@ void Sudoku::changeCol(int a,int b){
 		}
 		if(a==2){
 			int temp[9][9];
-			for(int i=0;i<=8;i++){
-				for(int j=0;j<=2;j++){
+			for(int i=0;i<9;i++){
+				for(int j=0;j<3;j++){
 					temp[i][j]=map1[i][j+6];
 				}
 			}
 			if(b==0){
-				for(int i=0;i<=8;i++){
-					for(int j=0;j<=2;j++){
+				for(int i=0;i<9;i++){
+					for(int j=0;j<3;j++){
 						map1[i][j+6]=map1[i][j];
 						map1[i][j]=temp[i][j];
 					}
@@ -383,8 +386,8 @@ void Sudoku::changeCol(int a,int b){
 				break;
 			}
 			else if(b==1){
-				for(int i=0;i<=8;i++){
-					for(int j=0;j<=2;j++){
+				for(int i=0;i<9;i++){
+					for(int j=0;j<3;j++){
 						map1[i][j+6]=map1[i][j+3];
 						map1[i][j+3]=temp[i][j];
 					}
@@ -394,80 +397,53 @@ void Sudoku::changeCol(int a,int b){
 			else if(b==2){break;}
 		}
 	}
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
-			buffer[i][j]=map1[i][j];
-		}
-	}
+	mapTobuffer();
 }
 
-void Sudoku::rotate(int n){
-	for(;;){
-		if(n==0){break;}
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
-				map1[i][j]=buffer[j+8-2*j][i];
+void Sudoku::rotate(int n){ //使數獨順時針旋轉90*n度
+	n%=4;
+	while(n--){
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
+				buffer[j][8-i]=map1[i][j];
 			}
 		}
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
-				buffer[i][j]=map1[i][j];
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
+				map1[i][j]=buffer[i][j];
 			}
 		}
-		if(n==1){break;}
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
-				map1[i][j]=buffer[j+8-2*j][i];
-			}
-		}
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
-				buffer[i][j]=map1[i][j];
-			}
-		}
-		if(n==2){break;}
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
-				map1[i][j]=buffer[j+8-2*j][i];
-			}
-		}
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
-				buffer[i][j]=map1[i][j];
-			}
-		}
-		if(n==3){break;}
 	}
 }
 
 void Sudoku::flip(int n){
 	if(n==0){
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
 				map1[i][j]=buffer[8-i][j];
 			}
 		}
 	}
 	else if(n==1){
-		for(int i=0;i<=8;i++){
-			for(int j=0;j<=8;j++){
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
 				map1[i][j]=buffer[i][8-j];
 			}
 		}
 	}
-	for(int i=0;i<=8;i++){
-		for(int j=0;j<=8;j++){
-			buffer[i][j]=map1[i][j];
-		}
-	}
+	mapTobuffer();
 }
 
 void Sudoku::change(){
 	srand(time(NULL));
-	changeNum(rand()%9+1,rand()%9+1);
-	changeRow(rand()%3,rand()%3);
-	changeCol(rand()%3,rand()%3);
-	rotate(rand()%101);
+	for(int i=0,j=rand()%9;i<j;i++){
+		changeNum(rand()%9+1,rand()%9+1);
+	}
+	for(int i=0,j=rand()%3+1;i<j;i++){
+		changeRow(rand()%3,rand()%3);
+		changeCol(rand()%3,rand()%3);
+	}
+	rotate(rand()%4);
 	flip(rand()%2);
 }
 
